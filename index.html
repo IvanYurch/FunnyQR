@@ -38,6 +38,46 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
     <script>
+         // Блокировка контекстного меню (правой кнопки мыши)
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Предотвращение использования клавиатуры для управления видео (пробел, стрелки)
+        document.addEventListener('keydown', function(event) {
+            // Блокируем пробел (обычно пауза/воспроизведение)
+            if (event.code === 'Space') {
+                event.preventDefault();
+            }
+            // Блокируем стрелки (обычно перемотка)
+            if (event.key.startsWith('Arrow')) {
+                event.preventDefault();
+            }
+        });
+
+        // Блокировка событий, связанных с прогрессом видео (mousemove, seeking, и т.д.)
+        const video = document.getElementById('myVideo');
+
+        video.addEventListener('mousemove', (event) => {
+            event.preventDefault(); // Предотвратить выделение текста и другие действия
+        });
+
+        video.addEventListener('seeking', (event) => {
+            event.preventDefault();
+            video.currentTime = video.previousTime || 0; // Возвращаемся к предыдущей позиции
+        });
+
+        video.addEventListener('seeked', (event) => {
+            event.preventDefault();
+            video.currentTime = video.previousTime || 0; // Возвращаемся к предыдущей позиции
+        });
+
+        video.addEventListener('pause', (event) => {
+            video.play();  // Автоматически возобновляем воспроизведение
+        });
+
+        // Запоминаем предыдущую позицию воспроизведения
+        video.addEventListener('timeupdate', function() {
+            this.previousTime = this.currentTime;
+        });
       // Конфигурация Firebase (замените своими данными)
       const firebaseConfig = {
   apiKey: "AIzaSyCLirDt-5tmT4AQnVJKiMmwvV1GjcPMBGM",
