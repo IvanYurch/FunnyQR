@@ -72,7 +72,7 @@
             if (!isSeeking) {
                 event.preventDefault();
                 isSeeking = true;
-                video.currentTime = video.previousTime || 0; // Используем сохраненное время или 0, если оно не определено.
+                                video.currentTime = video.previousTime || 0; // Используем сохраненное время или 0, если оно не определено.
             }
         });
 
@@ -108,7 +108,7 @@
         // Функция для получения и обновления счетчика
         function updateVisitorCount() {
             counterRef.transaction(function(current_value) {
-                return (current_value || 0) + 1;
+                return (current_value || 0) + 1; // Fixed: Using || 0
             }).then(function(snapshot) {
                 // Успешное обновление счетчика
                 const visitorCount = snapshot.val();
@@ -125,3 +125,4 @@
 
 </body>
 </html>
+
