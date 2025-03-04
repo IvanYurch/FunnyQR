@@ -1,6 +1,8 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><span id="visitor-count">Загрузка...</span></title>
@@ -29,10 +31,60 @@
         Ваш браузер не поддерживает HTML5 видео.
     </video>
 
-    <p>Ты везунчик №: <span id="visitor-count">Загрузка...</span></p>
+    <p>Просмотров: <span id="visitor-count">Загрузка...</span></p>
+
+    <!-- Добавляем Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
     <script>
-        
-    </script>
+      // Конфигурация Firebase (замените своими данными)
+      const firebaseConfig = {
+  apiKey: "AIzaSyCLirDt-5tmT4AQnVJKiMmwvV1GjcPMBGM",
+  authDomain: "funnyqrcounter.firebaseapp.com",
+  projectId: "funnyqrcounter",
+  storageBucket: "funnyqrcounter.firebasestorage.app",
+  messagingSenderId: "1012953083960",
+  appId: "1:1012953083960:web:48dd5a68d64249e59ab6cd"
+};
+
+      // Инициализация Firebase
+      firebase.initializeApp(firebaseConfig);
+
+      const db = firebase.database();
+      const counterRef = db.ref("visitors"); // Ссылка на счетчик в базе данных
+
+      function incrementCounter() {
+        counterRef.transaction((currentValue) => {
+          return (currentValue || 0) + 1;
+        }, (error, committed, snapshot) => { // Обработчик завершения транзакции
+           if (error) {
+              console.log('Transaction failed abnormally!', error);
+           } else if (!committed) {
+              console.log('Transaction aborted by the server.');
+           } else {
+              console.log('Transaction committed!');
+           }
+        });
+      }
+
+      function displayCount() {
+        counterRef.get().then((snapshot) => {
+          if (snapshot.exists()) {
+            document.getElementById("visitor-count").textContent = snapshot.val();
+          } else {
+            document.getElementById("visitor-count").textContent = "0";
+            counterRef.set(0); // Устанавливаем начальное значение, если счетчик еще не создан
+          }
+        }).catch((error) => {
+          console.error(error);
+          document.getElementById("visitor-count").textContent = "Ошибка загрузки";
+        });
+      }
+
+      // Вызываем функции
+      incrementCounter(); // Увеличиваем счетчик при загрузке страницы
+      displayCount();      // Отображаем текущее значение счетчика
+</script>
 </body>
 </html>
