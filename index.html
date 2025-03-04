@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Видео и счетчик</title>
+    <style>
+        body {
+            margin: 0; /* Убираем все отступы по умолчанию */
+            display: flex;          /* Используем flexbox */
+            flex-direction: column;  /* Размещаем элементы вертикально */
+            justify-content: center; /* Выравниваем по вертикали */
+            align-items: center;     /* Выравниваем по горизонтали */
+            min-height: 100vh;       /* Занимаем всю высоту экрана */
+            background-color: #f0f0f0; /* Светлый фон */
+        }
+
+        video {
+            max-width: 80%; /* Максимальная ширина видео (80% экрана) */
+            max-height: 80vh;/* Максимальная высота видео (80% экрана)*/
+            margin-bottom: 20px; /* Отступ между видео и счетчиком */
+        }
+    </style>
+</head>
+<body>
+
+    <video controls>
+        <source src="smeshno.mp4" type="video/mp4">
+        Ваш браузер не поддерживает HTML5 видео.
+    </video>
+
+    <p>Просмотров: <span id="visitor-count">Загрузка...</span></p>
+
+    <script>
+        // Здесь будет код для счетчика посетителей
+    </script>
+</body>
+</html>
