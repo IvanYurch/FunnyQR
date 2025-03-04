@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотры</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #000;
+            overflow: hidden; /* Предотвращает появление полос прокрутки */
+        }
+
+        video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        p {
+            color: white;
+            font-size: 1.5em;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <video id="myVideo" autoplay muted playsinline loop disablePictureInPicture>
+        <source src="smeshno.mp4" type="video/mp4">
+        Ваш браузер не поддерживает HTML5 видео.
+    </video>
+
+    <p>Просмотров: <span id="visitor-count">Загрузка...</span></p>
+
+    <!-- Добавляем Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+    <script>
+        // Блокировка контекстного меню (правой кнопки мыши)
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Предотвращение использования клавиатуры для управления видео (пробел, стрелки)
+        document.addEventListener('keydown', function(event) {
+            // Блокируем пробел (обычно пауза/воспроизведение)
+            if (event.code === 'Space') {
+                event.preventDefault();
+            }
+            // Блокируем стрелки (обычно перемотка)
+            if (event.key.startsWith('Arrow')) {
+                event.preventDefault();
+            }
+        });
+
+        // Блокировка событий, связанных с прогрессом видео (mousemove, seeking, и т.д.)
+        const video = document.getElementById('myVideo');
+
+        // Флаг для предотвращения бесконечного цикла перемотки
+        let isSeeking = false;
+
+        video.addEventListener('seeking', (event) => {
+            if (!isSeeking) {
+                event.preventDefault();
+                isSeeking = true;
+                video.currentTime = video.previousTime || 0; // Используем сохраненное время или 0, если оно не определено.
+            }
+        });
+
+        video.addEventListener('seeked', (event) => {
+            isSeeking = false; // Снимаем флаг
+        });
+
+        video.addEventListener('pause', (event) => {
+            video.play();  // Автоматически возобновляем воспроизведение
+        });
+
+        // Запоминаем предыдущую позицию воспроизведения
+        video.addEventListener('timeupdate', function() {
+            this.previousTime = this.currentTime;
+        });
+
+      // Конфигурация Firebase (замените своими данными)
+      const firebaseConfig = {
+  apiKey: "AIzaSyCLirDt-5tmT4AQnVJKiMmwvV1GjcPMBGM",
+  authDomain: "funnyqrcounter.firebaseapp.com",
+  projectId: "funnyqrcounter",
+  storageBucket: "funnyqrcounter.firebasestorage.app",
+  messagingSenderId: "1012953083960",
+  appId: "1:1012953083960:web:48dd5a68d64249e59ab6cd"
+};
+
+      // Инициализация Firebase
+      firebase.initializeApp(firebaseConfig);
+
+      const db = firebase.database();
+      const counterRef = db.ref("visitors"); // Ссылка на счетчик в базе данных
+
+        // Функция для получения и обновления счетчика
+        function updateVisitorCount() {
+            counterRef.transaction(function(current_value) {
+                return (current_value || 0) + 1;
+            }).then(function(snapshot) {
+                // Успешное обновление счетчика
+                const visitorCount = snapshot.val();
+                document.getElementById("visitor-count").textContent = visitorCount;
+            }).catch(function(error) {
+                console.error("Ошибка при обновлении счетчика: ", error);
+                document.getElementById("visitor-count").textContent = "Ошибка загрузки";
+            });
+        }
+
+        // Вызываем функцию для обновления счетчика при загрузке страницы
+        updateVisitorCount();
+    </script>
+
+</body>
+</html>
